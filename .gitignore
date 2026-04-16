@@ -1,0 +1,16 @@
+# Environments
+squat/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDEs
+.vscode/
+.idea/
+
+# Video artifacts
+temp_video.mp4
+output*.mp4
+*.avi
+*.mov
