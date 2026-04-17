@@ -213,3 +213,6 @@ All angle thresholds are defined in `thresholds.py` inside `get_thresholds_begin
 
 ---
 
+##  DEPLOYED ON STREAMLIT
+LINK-https://squatestimation.streamlit.app
+
