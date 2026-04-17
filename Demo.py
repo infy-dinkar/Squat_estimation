@@ -1,20 +1,18 @@
 import streamlit as st
 
-st.set_page_config(page_title="AI Squat Tracker", layout="wide")
+# ── Single global page config — must live in the entrypoint only ──────────────
+st.set_page_config(
+    page_title="AI Fitness Trainer",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
-st.title(" AI Squat Analysis System")
-st.markdown("""
-Welcome to the AI Squat Tracker!
-This application uses MediaPipe and OpenCV to track your squat posture in real-time.
+# ── Explicit navigation (required by Streamlit >= 1.36) ───────────────────────
+# Defining pages here prevents the "Cannot infer page title" MPA v1 error.
+pg = st.navigation([
+    st.Page("pages/Home.py",         title="Home",         default=True),
+    st.Page("pages/Live_Stream.py",  title="Live Stream"),
+    st.Page("pages/Upload_Video.py", title="Upload Video"),
+])
 
-### Features
-- **Live Webcam Mode**: Stream directly from your browser to analyze squats instantly.
-- **Video Upload Mode**: Upload prerecorded videos to get analytics.
-
-### How it works
-1. **Pose Detection**: We track your body landmarks in real-time.
-2. **Camera Alignment**: Make sure you are standing in a side-profile view (camera aligned to your side).
-3. **Squat Analytics**: We analyze your knee, hip, and ankle angles to output live transition state tracking and posture feedback.
-
-⬅ **Select a mode from the sidebar to begin.**
-""")
+pg.run()

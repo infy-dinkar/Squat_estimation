@@ -1,96 +1,49 @@
+# AI Fitness Trainer
 
-# AI Squat Tracker
-
-A real-time AI-powered squat analysis system built with Streamlit, MediaPipe, and OpenCV. The app detects your body posture using a webcam or an uploaded video, tracks your squat movement phases, counts correct and incorrect squats, and gives plain-English coaching feedback in real time.
-
----
-
-## Demo
-
-| Live Webcam Mode | Upload Video Mode |
-|:---:|:---:|
-| Stream directly from your browser | Upload `.mp4`, `.mov`, or `.avi` |
-| Real-time skeleton overlay | Frame-by-frame analysis |
-| Instant posture feedback | Downloadable annotated output video |
+A real-time, AI-powered multi-exercise analysis system built with Streamlit, MediaPipe, and OpenCV. The app tracks your body posture via webcam or uploaded video to provide comprehensive coaching, count completed repetitions, and offer targeted improvement suggestions across three major exercises: **Squats**, **Push-ups**, and **Lunges**.
 
 ---
 
-## Features
+## Supported Exercises
 
-- Live Webcam Analysis — browser-based, powered by WebRTC  
-- Uploaded Video Analysis — process pre-recorded squat videos and download annotated output  
-- Pose Detection — uses MediaPipe Pose to track 33 body landmarks  
-- Angle Computation — calculates hip, knee, and ankle angles relative to a vertical reference  
-- Squat Phase Detection — maps movement into Standing (S1), Transition (S2), Bottom (S3)  
-- Correct / Incorrect Squat Counting — based on full range of motion and posture quality  
-- Real-time Coaching Feedback — messages like "Your knee is going past your toes"  
-- Inactivity Reset — resets counters if the user leaves the frame  
-- Annotated Frame Rendering — skeleton overlay, reference lines, and angle values  
+| Exercise | Camera Angle | What We Analyze |
+|----------|--------------|-----------------|
+| **Squat** | Side profile | Knee tracking, hip depth, ankle angle, forward lean. Enforces parallel stance. |
+| **Push-up** | Side profile | Elbow angle, body straightness, knee alignment. Enforces horizontal orientation. |
+| **Lunge** | Side profile | Front knee depth, back leg stability, torso posture, knee-over-toe check. Enforces split stance. |
+
+---
+
+## Key Features
+
+- **Multi-Exercise Mechanics:** Distinct state machines (s1 → s2 → s3 → s2 → s1) and configuration thresholds for Squats, Push-ups, and Lunges.
+- **Exercise Authenticity Guard:** Prevents false counting by dynamically measuring your body's overall orientation (horizontal vs. vertical) and foot stance width (parallel vs. split) to ensure you are actually performing the selected exercise.
+- **Human-Friendly Coaching:** Real-time on-screen banners like *"Straighten your back leg to keep it stable"* alongside positive reinforcement hints like *"Perfect depth! Now drive back up"*.
+- **Flexible Tolerance:** Employs a smart 10% tolerance threshold allowing flexibility for realistic movement variations while keeping the core coaching feedback strict and actionable.
+- **Post-Workout Suggestions:** Instead of generic "Bad reps", the app provides a single `Total Reps` counter and aggregates all unique posture corrections triggered during your session into a helpful **Suggested Improvements** digest.
+- **Modern Architecture:** Utilizes Streamlit's official `st.navigation` framework for a clean sidebar UI splitting Home, Live Stream, and Upload Video interfaces.
 
 ---
 
 ## Project Structure
 
 ```
-
 Squat_Tracker/
 │
-├── Demo.py
-├── process_frame.py
-├── thresholds.py
-├── utils.py
+├── Demo.py              # Navigation entrypoint (Run this!)
+├── process_frame.py     # Core computer vision & state-machine logic
+├── thresholds.py        # Exercise-specific angle configurations & tolerances
+├── utils.py             # Math helpers for angle calculation & joint extraction
+├── verify.py            # Diagnostic script to check model pipeline health
 ├── requirements.txt
-├── .gitignore
 │
 ├── pages/
-│   ├── Live_Stream.py
-│   └── Upload_Video.py
+│   ├── Home.py          # App landing and introduction
+│   ├── Live_Stream.py   # Webcam WebRTC interface
+│   └── Upload_Video.py  # MP4 video upload and processing interface
 │
-└── squat/   # Conda environment (not committed)
-
-````
-
----
-
-## How It Works
-
-### 1. Pose Detection
-Each frame is processed by MediaPipe Pose to extract 33 body landmarks.
-
-### 2. Camera Alignment Check
-Ensures the user is in side view using shoulder–nose offset angle.
-
-### 3. Body Side Selection
-Chooses left or right body side based on visibility.
-
-### 4. Angle Computation
-Calculates vertical reference angles:
-
-- Hip angle
-- Knee angle
-- Ankle angle
-
-### 5. Squat State Machine
-
-| State | Meaning | Range |
-|------|--------|------|
-| S1 | Standing | 0°–32° |
-| S2 | Transition | 35°–65° |
-| S3 | Bottom | 70°–95° |
-
-### 6. Rep Counting
-Valid squat sequence:
-S2 → S3 → S2 → S1
-
-- Correct: full sequence + good posture  
-- Incorrect: incomplete or bad posture  
-
-### 7. Feedback
-Displays posture warnings such as:
-
-- Leaning too forward
-- Knee over toe
-- Not deep enough
+└── squat/               # Conda Python environment (not committed)
+```
 
 ---
 
@@ -98,160 +51,74 @@ Displays posture warnings such as:
 
 ### Prerequisites
 
-- Anaconda or Miniconda  
+- Anaconda or Miniconda
 - Python 3.11 (local) or 3.12 (recommended for deployment)
 
 ---
 
-### Clone Repository
+### Installation
 
-```bash
-git clone https://github.com/your-username/squat-tracker.git
-cd squat-tracker
-````
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/your-username/fitness-trainer.git
+   cd fitness-trainer
+   ```
+
+2. **Create the isolated Environment**
+   ```bash
+   conda create -p ./squat python=3.11 -y
+   conda activate ./squat
+   ```
+
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+   > **Important:** Keep `mediapipe==0.10.21`, `numpy<2`, and the specified OpenCV version untouched. Upgrading MedaiPipe will break the `solutions` API.
 
 ---
 
-### Create Environment
+### Running the App
+
+Always execute the application from the project root using the activated Conda environment:
 
 ```bash
-conda create -p ./squat python=3.11 -y
 conda activate ./squat
-```
-
----
-
-### Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-Important Notes:
-
-* mediapipe==0.10.21 is required because newer versions removed the `solutions` API
-* numpy<2 is required for compatibility
-* OpenCV is pinned to avoid deployment issues
-
----
-
-### Run App
-
-```bash
 streamlit run Demo.py
 ```
 
 ---
 
-## Usage Guide
-
-### Live Webcam Mode
-
-1. Open Live Stream page
-2. Click Start
-3. Stand sideways to the camera
-4. Ensure full body is visible
-5. Perform squats
-
----
-
-### Upload Video Mode
-
-1. Open Upload Video page
-2. Upload a video file
-3. Wait for processing
-4. View results and download output
-
----
-
-## Known Limitations
-
-### Live Webcam on Streamlit Cloud
-
-* WebRTC connection may fail on some networks
-* Requires STUN/TURN configuration
-* Works best on local machine or stable WiFi
-
-If webcam fails, use Upload Video Mode.
-
----
-
-### Camera Position Dependency
-
-* Must stand sideways
-* Full body must be visible
-* Camera at hip height
-* Good lighting required
-
----
-
-### Frame Noise in Live Mode
-
-* Frame drops may occur
-* Minor inaccuracies possible
-* Smoothing reduces noise but not fully
-
----
-
 ## Configuration
 
-Defined in `thresholds.py`:
+Exercise configurations (angles, flexibility tolerance, and inactivity limits) are managed in `thresholds.py`.
 
 ```python
-{
-    'HIP_KNEE_VERT': {
-        'NORMAL': (0, 32),
-        'TRANS':  (35, 65),
-        'PASS':   (70, 95)
-    },
-    'HIP_THRESH': [10, 50],
-    'ANKLE_THRESH': 45,
-    'KNEE_THRESH': [50, 70, 95],
-    'OFFSET_THRESH': 35.0,
-    'INACTIVE_THRESH': 15.0,
-    'CNT_FRAME_THRESH': 50
-}
+# Example Snippet
+def get_pushup_thresholds():
+    return {
+        'ELBOW_THRESH': {'TOP': 150, 'TRANS_MIN': 90, 'BOTTOM': 90},
+        'BODY_ANGLE_MIN': 170,
+        'LEG_ANGLE_MIN': 170,
+        'TOLERANCE': 0.10,          # 10% flexibility for state locks
+        'INACTIVE_THRESH': 15.0     # Reset loop if leaving frame for 15s
+    }
 ```
 
 ---
 
 ## Dependencies
 
-| Package                | Version   |
-| ---------------------- | --------- |
-| streamlit              | latest    |
-| streamlit-webrtc       | latest    |
-| mediapipe              | 0.10.21   |
-| opencv-python-headless | 4.10.0.84 |
-| numpy                  | <2        |
+| Package                | Version   | Purpose |
+| ---------------------- | --------- | ------- |
+| **streamlit**          | latest    | UI framework, `st.navigation` support |
+| **streamlit-webrtc**   | latest    | Live browser webcam tracking |
+| **mediapipe**          | 0.10.21   | 33-point body map Pose estimation |
+| **opencv-python-headless** | 4.10.0.84 | Drawing skeleton overlays & video processing |
 
 ---
 
-## Deployment Notes
+## Known Limitations
 
-To deploy on Streamlit Cloud:
-
-1. Set Python version to 3.12
-2. Use pinned requirements.txt
-3. Reboot app after updates
-
----
-
-### Common Issues
-
-| Issue                   | Cause             | Fix             |
-| ----------------------- | ----------------- | --------------- |
-| MediaPipe install error | Python mismatch   | Use Python 3.12 |
-| mp.solutions error      | Wrong version     | Use 0.10.21     |
-| cv2 import error        | OpenCV mismatch   | Pin version     |
-| Webcam not working      | WebRTC limitation | Use upload mode |
-
----
-
-## Live Demo
-
-[https://squatestimation.streamlit.app](https://squatestimation.streamlit.app)
-
-```
-
-
+- **Camera Positioning:** You must ensure the camera has a clear view of your **side profile**. The Authenticity Check will prevent counting if you face the camera squarely.
+- **WebRTC on Deployment:** Live webcam functionality relies on strict network requirements. If it repeatedly fails to connect on mobile or cloud Wi-Fi setups, use the **Upload Video** module instead.

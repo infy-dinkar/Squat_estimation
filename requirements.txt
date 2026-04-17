@@ -3,3 +3,12 @@ opencv-python-headless==4.10.0.84
 mediapipe==0.10.21
 numpy<2
 streamlit-webrtc
+
+
+
+
+
+
+
+
+
