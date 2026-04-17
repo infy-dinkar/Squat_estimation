@@ -209,7 +209,7 @@ All angle thresholds are defined in `thresholds.py` inside `get_thresholds_begin
 
 - **Flip-then-draw** in live mode: The frame is horizontally flipped first, and all annotations are drawn after. This ensures text and overlays are always readable (not mirrored).
 - **Vertical reference angles** instead of classic 3-point joint angles: This gives more stable and intuitive phase detection that isn't affected by the person's position in the frame.
-- **MediaPipe `solutions` API**: Requires `mediapipe==0.10.14` — the newer Tasks API lacks a drop-in replacement for `mp.solutions.pose`.
+- **MediaPipe `solutions` API**: Requires `mediapipe==0.10.21` — the newer Tasks API lacks a drop-in replacement for `mp.solutions.pose`.
 
 ---
 
