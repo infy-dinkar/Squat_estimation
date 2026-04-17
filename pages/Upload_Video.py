@@ -19,7 +19,7 @@ if uploaded_file is not None:
     tfile.write(uploaded_file.read())
     tfile.close()
 
-    st.info(" Analysing your video, please wait...")
+   
 
     cap = cv2.VideoCapture(tfile.name)
     width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
